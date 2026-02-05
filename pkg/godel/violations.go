@@ -41,4 +41,3 @@ type ViolationsError Violations
 func (err ViolationsError) Error() string {
 	return fmt.Sprintf("%d violation(s)", len(err))
 }
-

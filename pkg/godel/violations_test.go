@@ -35,4 +35,3 @@ func TestViolations(t *testing.T) {
 		})
 	})
 }
-
