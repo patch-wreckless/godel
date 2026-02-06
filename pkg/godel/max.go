@@ -3,7 +3,6 @@ package godel
 import (
 	"fmt"
 	"reflect"
-	"slices"
 )
 
 var _ Constraint = Max{}
@@ -11,15 +10,8 @@ var _ Constraint = Max{}
 // Max is a [Constraint] requiring a value to be less than or equal to a given value.
 type Max struct {
 
-	// TargetPath determines where the [Max] should be applied to the evaluated values.
-	TargetPath []FieldName
-
 	// Value is the maximum value that will be considered valid.
 	Value int64
-}
-
-func (m Max) Path() []FieldName {
-	return slices.Clone(m.TargetPath)
 }
 
 func (m Max) Check(val any) Violations {
