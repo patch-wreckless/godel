@@ -4,15 +4,8 @@ import (
 	"fmt"
 )
 
-// A FieldName is a name of a field within some structured data.
-type FieldName string
-
 // A Violation represents an instance of a value not satisfying a [Constraint].
 type Violation struct {
-
-	// Path is a series of [FieldName] values representing where the [Violation]
-	// occurred within the value that was checked.
-	Path []FieldName
 
 	// Description explains why the value did not satisfy the [Constraint].
 	Description string
