@@ -1,6 +1,7 @@
 package godel
 
 import (
+	"errors"
 	"testing"
 )
 
@@ -8,15 +9,29 @@ func TestMin(t *testing.T) {
 
 	t.Run("#Check", func(t *testing.T) {
 
-		t.Run("non-numeric value/panics", func(t *testing.T) {
-			defer func() {
-				if r := recover(); r == nil {
-					t.Fatalf("expected panic; got none")
-				}
-			}()
-
+		t.Run("non-numeric value/returns Inapplicable", func(t *testing.T) {
 			underTest := Max{Value: 10}
-			underTest.Check("non-numeric")
+			expected := Inapplicable{
+				Constraint: underTest,
+				Value:      "non-numeric",
+			}
+			violations := underTest.Check(expected.Value)
+			if n := len(violations); n != 1 {
+				t.Fatalf("expected 1 violation; got %d", n)
+			}
+			var actual Inapplicable
+			if err := violations[0].Error; !errors.As(err, &actual) {
+				t.Fatalf(
+					"expected violations[1].Error to be %T; got %T",
+					expected,
+					err)
+			}
+			if actual != expected {
+				t.Fatalf(
+					"expected violations[1].Error to be %v; got %v",
+					expected,
+					actual)
+			}
 		})
 
 		const (

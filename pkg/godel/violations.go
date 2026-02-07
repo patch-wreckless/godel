@@ -2,13 +2,18 @@ package godel
 
 import (
 	"fmt"
+
+	"github.com/patch-wreckless/godel/pkg/fields"
 )
 
 // A Violation represents an instance of a value not satisfying a [Constraint].
 type Violation struct {
 
-	// Description explains why the value did not satisfy the [Constraint].
-	Description string
+	// Path describes where the violation occurred within the evaluated value.
+	Path fields.Path
+
+	// Error explains why the value did not satisfy the [Constraint].
+	Error error
 }
 
 // Violations are a collection of [Violation] values.

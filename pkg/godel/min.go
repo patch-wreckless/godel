@@ -18,25 +18,32 @@ func (m Min) Check(val any) Violations {
 	rv := reflect.ValueOf(val)
 	kind := rv.Kind()
 
-	valid := func() bool {
-		switch kind {
-		case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uint:
-			return rv.Uint() >= uint64(m.Value)
-		case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Int:
-			return rv.Int() >= m.Value
-		case reflect.Float32, reflect.Float64:
-			return rv.Float() >= float64(m.Value)
-		default:
-			panic(fmt.Sprintf("Min.Check received non-numeric value: %v", val))
-		}
-	}()
-
-	if !valid {
+	lessThanViolation := func() Violations {
 		return Violations{
 			{
-				Description: fmt.Sprintf("value %v is less than min value %d", val, m.Value),
+				Error: fmt.Errorf(
+					"value %v is less than min value %d",
+					val,
+					m.Value),
 			},
 		}
+	}
+
+	switch kind {
+	case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uint:
+		if rv.Uint() < uint64(m.Value) {
+			return lessThanViolation()
+		}
+	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Int:
+		if rv.Int() < m.Value {
+			return lessThanViolation()
+		}
+	case reflect.Float32, reflect.Float64:
+		if rv.Float() < float64(m.Value) {
+			return lessThanViolation()
+		}
+	default:
+		return Violations{{Error: Inapplicable{Constraint: m, Value: val}}}
 	}
 
 	return nil

@@ -1,6 +1,7 @@
 package godel
 
 import (
+	"errors"
 	"testing"
 )
 
@@ -25,7 +26,7 @@ func TestViolations(t *testing.T) {
 		t.Run("Violations is non-empty/returns ViolationsError", func(t *testing.T) {
 			underTest := Violations{
 				{
-					Description: "some violation",
+					Error: errors.New("some violation"),
 				},
 			}
 			err := underTest.Err()

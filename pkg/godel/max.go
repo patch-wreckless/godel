@@ -18,25 +18,32 @@ func (m Max) Check(val any) Violations {
 	rv := reflect.ValueOf(val)
 	kind := rv.Kind()
 
-	valid := func() bool {
-		switch kind {
-		case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uint:
-			return rv.Uint() <= uint64(m.Value)
-		case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Int:
-			return rv.Int() <= m.Value
-		case reflect.Float32, reflect.Float64:
-			return rv.Float() <= float64(m.Value)
-		default:
-			panic(fmt.Sprintf("Max.Check received non-numeric value: %v", val))
-		}
-	}()
-
-	if !valid {
+	greaterThanViolation := func() Violations {
 		return Violations{
 			{
-				Description: fmt.Sprintf("value %v exceeds max value %d", val, m.Value),
+				Error: fmt.Errorf(
+					"value %v is greater than max value %d",
+					val,
+					m.Value),
 			},
 		}
+	}
+
+	switch kind {
+	case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uint:
+		if rv.Uint() > uint64(m.Value) {
+			return greaterThanViolation()
+		}
+	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Int:
+		if rv.Int() > m.Value {
+			return greaterThanViolation()
+		}
+	case reflect.Float32, reflect.Float64:
+		if rv.Float() > float64(m.Value) {
+			return greaterThanViolation()
+		}
+	default:
+		return Violations{{Error: Inapplicable{Constraint: m, Value: val}}}
 	}
 
 	return nil

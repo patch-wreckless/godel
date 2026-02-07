@@ -1,6 +1,7 @@
 package godel
 
 import (
+	"errors"
 	"slices"
 	"testing"
 )
@@ -37,7 +38,7 @@ func TestConstraints(t *testing.T) {
 
 		t.Run("single constraint returns single violation/returns the violation", func(t *testing.T) {
 			expected := Violations{
-				Violation{Description: "constraint violated"},
+				Violation{Error: errors.New("constraint violated")},
 			}
 			underTest := Constraints{
 				mockConstraint{violations: slices.Clone(expected)},
@@ -48,8 +49,8 @@ func TestConstraints(t *testing.T) {
 
 		t.Run("single constraint returns multiple violation/returns all violations", func(t *testing.T) {
 			expected := Violations{
-				Violation{Description: "constraint violated"},
-				Violation{Description: "another constraint violated"},
+				Violation{Error: errors.New("constraint violated")},
+				Violation{Error: errors.New("another constraint violated")},
 			}
 			underTest := Constraints{
 				mockConstraint{violations: slices.Clone(expected)},
@@ -71,9 +72,9 @@ func TestConstraints(t *testing.T) {
 
 		t.Run("multiple constraints return violations/returns all violations", func(t *testing.T) {
 			expected := Violations{
-				Violation{Description: "constraint violated"},
-				Violation{Description: "another constraint violated"},
-				Violation{Description: "yet another constraint violated"},
+				Violation{Error: errors.New("constraint violated")},
+				Violation{Error: errors.New("another constraint violated")},
+				Violation{Error: errors.New("yet another constraint violated")},
 			}
 			underTest := Constraints{
 				mockConstraint{violations: slices.Clone(expected[:2])},
