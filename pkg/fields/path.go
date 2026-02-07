@@ -1,8 +1,10 @@
 package fields
 
-import "fmt"
+import (
+	"fmt"
+)
 
-// Ensure Path remains comparable.
+// Ensure Path is comparable.
 var _ = Path{} == Path{}
 
 // A Path represents a field access path. It can include named fields and array
@@ -51,7 +53,7 @@ func (p Path) Split() []Identifier {
 		identifier, err := ParseIdentifier(identifierStr)
 		if err != nil {
 			panic(
-				fmt.Sprintf("at position %d in %s: %s",
+				fmt.Sprintf("invalid identifier at position %d in %q: %s",
 					r.start,
 					p.str,
 					err.Error()))

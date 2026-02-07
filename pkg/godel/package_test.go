@@ -14,8 +14,8 @@ func (m mockConstraint) Check(_ any) Violations {
 }
 
 func compareViolations(t *testing.T, expected, actual Violations) {
-	if len(expected) != len(actual) {
-		t.Errorf("expected %d violations; got %d: %v", len(expected), len(actual), actual)
+	if expected, actual := len(expected), len(actual); actual != expected {
+		t.Errorf("expected %d violation(s); got %d", expected, actual)
 	}
 	for _, e := range expected {
 		if !slices.Contains(actual, e) {

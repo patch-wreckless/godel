@@ -4,20 +4,18 @@ import (
 	"testing"
 )
 
-func compareIdentifier(t *testing.T, expected, actual Identifier) {
-	if !identiferEq(expected, actual) {
-		t.Errorf("expected Identifier %+v; got %+v", expected, actual)
-	}
-}
-
 func compareIdentifiers(t *testing.T, expected, actual []Identifier) {
-	if len(expected) != len(actual) {
-		t.Errorf("expected %d violations; got %d: %v", len(expected), len(actual), actual)
+	if expected, actual := len(expected), len(actual); actual != expected {
+		t.Errorf("expected %d identifier(s); got %d", expected, actual)
 	}
 
 	for i := range min(len(expected), len(actual)) {
-		if !identiferEq(expected[i], actual[i]) {
-			t.Errorf("expected Identifier[%d] to be %+v; got %+v", i, expected[i], actual[i])
+		if !identifierEq(expected[i], actual[i]) {
+			t.Errorf(
+				"expected Identifier[%d] to be %+v; got %+v",
+				i,
+				expected[i],
+				actual[i])
 		}
 	}
 
@@ -32,20 +30,6 @@ func compareIdentifiers(t *testing.T, expected, actual []Identifier) {
 	}
 }
 
-func identiferEq(a, b Identifier) bool {
-	if a.Name != b.Name {
-		return false
-	}
-
-	nilOrVal := func(ptr *int) any {
-		if ptr == nil {
-			return nil
-		}
-		return *ptr
-	}
-	if nilOrVal(a.Index) != nilOrVal(b.Index) {
-		return false
-	}
-
-	return true
+func identifierEq(a, b Identifier) bool {
+	return a == b
 }
