@@ -23,16 +23,17 @@ func TestViolations(t *testing.T) {
 			}
 		})
 
-		t.Run("Violations is non-empty/returns ViolationsError", func(t *testing.T) {
-			underTest := Violations{
-				{
-					Error: errors.New("some violation"),
-				},
-			}
-			err := underTest.Err()
-			if _, ok := err.(ViolationsError); !ok {
-				t.Fatalf("expected %T; got %T", ViolationsError{}, err)
-			}
-		})
+		t.Run("Violations is non-empty/returns ViolationsError",
+			func(t *testing.T) {
+				underTest := Violations{
+					{
+						Error: errors.New("some violation"),
+					},
+				}
+				err := underTest.Err()
+				if _, ok := err.(ViolationsError); !ok {
+					t.Fatalf("expected %T; got %T", ViolationsError{}, err)
+				}
+			})
 	})
 }

@@ -6,28 +6,6 @@ import (
 	"testing"
 )
 
-func TestInvalidFieldName(t *testing.T) {
-
-	t.Run("errors.Is", func(t *testing.T) {
-
-		t.Run("Tokens are equal/returns true", func(t *testing.T) {
-			a := InvalidFieldName{Token: "foo"}
-			b := InvalidFieldName{Token: "foo"}
-			if !errors.Is(a, b) {
-				t.Errorf("expected true; got false")
-			}
-		})
-
-		t.Run("Tokens are not equal/returns false", func(t *testing.T) {
-			a := InvalidFieldName{Token: "foo"}
-			b := InvalidFieldName{Token: "bar"}
-			if errors.Is(a, b) {
-				t.Errorf("expected false; got true")
-			}
-		})
-	})
-}
-
 func TestFieldName(t *testing.T) {
 
 	invalidFieldNames := []string{

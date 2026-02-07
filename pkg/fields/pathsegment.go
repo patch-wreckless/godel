@@ -24,7 +24,7 @@ type PathSegmentValueTypes interface {
 	PathSegmentValue
 }
 
-// NewPathSegment wraps the given [PathSegmentValueTypes] value as a [PathSegment].
+// NewPathSegment wraps the given value as a [PathSegment].
 func NewPathSegment[T PathSegmentValueTypes](val T) PathSegment {
 	return PathSegment{val: val}
 }

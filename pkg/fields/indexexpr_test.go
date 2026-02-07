@@ -7,14 +7,15 @@ import (
 
 func TestIndexExpr(t *testing.T) {
 
-	t.Run("#String/returns bracketed zero-indexed postition", func(t *testing.T) {
-		expected := "[42]"
-		underTest := IndexExpr(42)
-		actual := underTest.String()
-		if actual != expected {
-			t.Errorf("expected %q; got %q", expected, actual)
-		}
-	})
+	t.Run("#String/returns bracketed zero-indexed postition",
+		func(t *testing.T) {
+			expected := "[42]"
+			underTest := IndexExpr(42)
+			actual := underTest.String()
+			if actual != expected {
+				t.Errorf("expected %q; got %q", expected, actual)
+			}
+		})
 }
 
 func BenchmarkIndexExpr(b *testing.B) {
