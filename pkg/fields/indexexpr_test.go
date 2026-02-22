@@ -21,7 +21,7 @@ func TestIndexExpr(t *testing.T) {
 
 	t.Run("#Access", func(t *testing.T) {
 
-		t.Run("inapplicable to target type/returns not ok",
+		t.Run("target is not indexable/returns not ok",
 			func(t *testing.T) {
 
 				testCases := []struct {
@@ -94,43 +94,38 @@ func TestIndexExpr(t *testing.T) {
 				}
 			})
 
-		t.Run("target is non-nil slice/item is nil pointer/returns typed nil",
+		t.Run("target is array/index out of range/returns not ok",
+			// For arrays the length is part of the type so attempting to access
+			// an out of range index is comparable attempting to access a field
+			// that's not defined on a struct.
 			func(t *testing.T) {
-				var expected *string
-				target := []*string{ptr.To("the"), expected, ptr.To("value")}
+				target := [3]string{"zero", "one", "two"}
+				underTest := IndexExpr(len(target))
+				val, ok := underTest.Access(target)
+				if ok {
+					t.Errorf("expected not ok; got (%+v, true)", val)
+				}
+			})
+
+		t.Run("target is array/index in range/returns item value",
+			func(t *testing.T) {
+				expected := "expected"
+				target := [3]string{"the", expected, "value"}
 				underTest := IndexExpr(1)
 				val, ok := underTest.Access(target)
 				if !ok {
 					t.Error("expected ok to be true; got false")
 				}
-				actual, ok := val.(*string)
+				actual, ok := val.(string)
 				if !ok {
 					t.Fatalf("expected %T; got %T", expected, val)
 				}
 				if actual != expected {
-					t.Errorf("expected %p; got %p", expected, actual)
+					t.Errorf("expected %q; got %q", expected, actual)
 				}
 			})
 
-		t.Run("target is non-nil slice/item is non-nil pointer/returns item value",
-			func(t *testing.T) {
-				expected := ptr.To("expected")
-				target := []*string{ptr.To("the"), expected, ptr.To("value")}
-				underTest := IndexExpr(1)
-				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
-				actual, ok := val.(*string)
-				if !ok {
-					t.Fatalf("expected %T; got %T", expected, val)
-				}
-				if actual != expected {
-					t.Errorf("expected %p; got %p", expected, actual)
-				}
-			})
-
-		t.Run("target is defined type with kind slice/returns item value",
+		t.Run("target is defined type with kind slice/index in range/returns item value",
 			func(t *testing.T) {
 				type arr[T any] []T
 				expected := "expected"
@@ -146,6 +141,60 @@ func TestIndexExpr(t *testing.T) {
 				}
 				if actual != expected {
 					t.Errorf("expected %q; got %q", expected, actual)
+				}
+			})
+
+		t.Run("target is defined type with kind array/index in range/returns item value",
+			func(t *testing.T) {
+				type arr[T any] [3]T
+				expected := "expected"
+				target := arr[string]{"the", expected, "value"}
+				underTest := IndexExpr(1)
+				val, ok := underTest.Access(target)
+				if !ok {
+					t.Error("expected ok to be true; got false")
+				}
+				actual, ok := val.(string)
+				if !ok {
+					t.Fatalf("expected %T; got %T", expected, val)
+				}
+				if actual != expected {
+					t.Errorf("expected %q; got %q", expected, actual)
+				}
+			})
+
+		t.Run("item is nil pointer/returns typed nil",
+			func(t *testing.T) {
+				target := []*string{ptr.To("the"), nil, ptr.To("value")}
+				underTest := IndexExpr(1)
+				val, ok := underTest.Access(target)
+				if !ok {
+					t.Error("expected ok to be true; got false")
+				}
+				actual, ok := val.(*string)
+				if !ok {
+					t.Fatalf("expected %T; got %T", actual, val)
+				}
+				if actual != nil {
+					t.Errorf("expected nil; got %p", actual)
+				}
+			})
+
+		t.Run("item is non-nil pointer/returns item value",
+			func(t *testing.T) {
+				expected := ptr.To("expected")
+				target := []*string{ptr.To("the"), expected, ptr.To("value")}
+				underTest := IndexExpr(1)
+				val, ok := underTest.Access(target)
+				if !ok {
+					t.Error("expected ok to be true; got false")
+				}
+				actual, ok := val.(*string)
+				if !ok {
+					t.Fatalf("expected %T; got %T", expected, val)
+				}
+				if actual != expected {
+					t.Errorf("expected %p; got %p", expected, actual)
 				}
 			})
 
@@ -175,41 +224,10 @@ func TestIndexExpr(t *testing.T) {
 				}
 			})
 
-		t.Run("value is pointer to non-nil slice/returns item value",
+		t.Run("target is non-nil pointer to non-nil slice/returns item value",
 			func(t *testing.T) {
 				expected := "expected"
 				target := ptr.To([]string{"the", expected, "value"})
-				underTest := IndexExpr(1)
-				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
-				actual, ok := val.(string)
-				if !ok {
-					t.Fatalf("expected %T; got %T", expected, val)
-				}
-				if actual != expected {
-					t.Errorf("expected %q; got %q", expected, actual)
-				}
-			})
-
-		t.Run("target is array/index out of range/returns not ok",
-			// For arrays the length is part of the type so attempting to access
-			// an out of range index is comparable attempting to access a field
-			// that's not defined on a struct.
-			func(t *testing.T) {
-				target := [3]string{"zero", "one", "two"}
-				underTest := IndexExpr(len(target))
-				val, ok := underTest.Access(target)
-				if ok {
-					t.Errorf("expected not ok; got (%+v, true)", val)
-				}
-			})
-
-		t.Run("target is array/index in range/returns item value",
-			func(t *testing.T) {
-				expected := "expected"
-				target := [3]string{"the", expected, "value"}
 				underTest := IndexExpr(1)
 				val, ok := underTest.Access(target)
 				if !ok {

@@ -109,7 +109,7 @@ func TestFieldName(t *testing.T) {
 
 	t.Run("#Access", func(t *testing.T) {
 
-		t.Run("inapplicable to target type/returns not ok",
+		t.Run("target is not struct/returns not ok",
 			func(t *testing.T) {
 
 				testCases := []struct {
@@ -139,7 +139,7 @@ func TestFieldName(t *testing.T) {
 				}
 			})
 
-		t.Run("target struct has no matching/returns not ok",
+		t.Run("target is struct with no matching field/returns not ok",
 			func(t *testing.T) {
 				target := struct{}{}
 				underTest := MustFieldName("Foo")
@@ -149,7 +149,7 @@ func TestFieldName(t *testing.T) {
 				}
 			})
 
-		t.Run("target struct has matching unexpported field/returns not ok",
+		t.Run("target is struct with matching unexpported field/returns not ok",
 			func(t *testing.T) {
 				target := struct{ foo string }{
 					foo: "unexpected",
@@ -161,7 +161,7 @@ func TestFieldName(t *testing.T) {
 				}
 			})
 
-		t.Run("target struct has matching exported field/returns field value",
+		t.Run("target is struct with matching exported field/returns field value",
 			func(t *testing.T) {
 				expected := "expected"
 				target := struct{ Foo string }{
@@ -183,7 +183,26 @@ func TestFieldName(t *testing.T) {
 
 		t.Run("matching field is nil pointer/returns typed nil",
 			func(t *testing.T) {
-				var expected *string
+				target := struct{ Foo *string }{
+					Foo: nil,
+				}
+				underTest := MustFieldName("Foo")
+				val, ok := underTest.Access(target)
+				if !ok {
+					t.Error("expected ok to be true; got false")
+				}
+				actual, ok := val.(*string)
+				if !ok {
+					t.Fatalf("expected %T; got %T", actual, val)
+				}
+				if actual != nil {
+					t.Errorf("expected nil; got %p", actual)
+				}
+			})
+
+		t.Run("matching field is non-nil pointer/returns pointer value",
+			func(t *testing.T) {
+				expected := ptr.To("expected")
 				target := struct{ Foo *string }{
 					Foo: expected,
 				}
@@ -194,7 +213,7 @@ func TestFieldName(t *testing.T) {
 				}
 				actual, ok := val.(*string)
 				if !ok {
-					t.Fatalf("expected %T; got %T", expected, val)
+					t.Fatalf("expected %T; got %T", actual, val)
 				}
 				if actual != expected {
 					t.Errorf("expected %p; got %p", expected, actual)

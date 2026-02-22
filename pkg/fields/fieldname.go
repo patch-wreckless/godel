@@ -52,8 +52,21 @@ func (f FieldName) String() string {
 	return "." + string(f.name)
 }
 
-// Access applies the [FieldName] to the target value as an access expression
-// and returns the field value and true if it was applicable, otherwise false.
+// Access evaluates f as a field access expression on target. If the field
+// access is applicable to target then Access returns the field value and
+// true, otherwise it returns nil and false.
+//
+// A field access is considered applicable if target’s type is a struct with an
+// exported field named f. Applicability is defined recursively over pointer
+// types: if T is applicable, then *T, **T, etc. are also applicable.
+//
+// If the field access is applicable but evaluation cannot proceed because
+// some level of pointer indirection is nil, Access returns nil and true.
+//
+// If the field is applicable and every level of pointer indirection contains a
+// non-nil value, Access returns the field value and true. If the field value
+// itself is a nil pointer, the returned interface value is non-nil and holds a
+// typed nil pointer.
 func (f FieldName) Access(target any) (any, bool) {
 
 	valType := reflect.TypeOf(target)
