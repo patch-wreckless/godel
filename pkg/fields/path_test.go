@@ -22,5 +22,33 @@ func TestPath(t *testing.T) {
 					t.Fatalf("expected nil; got %+v", segments)
 				}
 			})
+
+		t.Run("Path initialized with segments/returns segments",
+			func(t *testing.T) {
+				expected := []PathSegment{
+					NewPathSegment(MustFieldName("Foo")),
+					NewPathSegment(IndexExpr(0)),
+					NewPathSegment(MustFieldName("Bar")),
+					NewPathSegment(AllItemsExpr{}),
+					NewPathSegment(MustFieldName("Baz")),
+				}
+				underTest := NewPath(expected)
+				actual := underTest.Segments()
+
+				minLen := min(len(expected), len(actual))
+				for i := range minLen {
+					exp := expected[i]
+					act := actual[i]
+					if actual[i] != expected[i] {
+						t.Errorf("expected [%d] to be %q; got %q", i, exp, act)
+					}
+				}
+				if len(expected) > minLen {
+					t.Errorf("missing expected items %v", expected[minLen:])
+				}
+				if len(actual) > minLen {
+					t.Errorf("got unexpected items %v", actual[minLen:])
+				}
+			})
 	})
 }
