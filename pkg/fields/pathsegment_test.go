@@ -2,6 +2,8 @@ package fields
 
 import (
 	"testing"
+
+	"github.com/patch-wreckless/godel/internal/assert"
 )
 
 func TestPathSegment(t *testing.T) {
@@ -20,12 +22,8 @@ func TestPathSegment(t *testing.T) {
 				underTest := NewPathSegment(expected)
 				val := underTest.Value()
 				actual, ok := val.(FieldName)
-				if !ok {
-					t.Fatalf("expected %T; got %T", expected, val)
-				}
-				if actual != expected {
-					t.Fatalf("expected %+v; got %+v", expected, val)
-				}
+				assert.Ok(t, ok)
+				assert.Equal(t, expected, actual)
 			})
 
 		t.Run("underlying value is IndexExpr/returns IndexExpr",
@@ -34,12 +32,8 @@ func TestPathSegment(t *testing.T) {
 				underTest := NewPathSegment(expected)
 				val := underTest.Value()
 				actual, ok := val.(IndexExpr)
-				if !ok {
-					t.Fatalf("expected %T; got %T", expected, val)
-				}
-				if actual != expected {
-					t.Fatalf("expected %+v; got %+v", expected, val)
-				}
+				assert.Ok(t, ok)
+				assert.Equal(t, expected, actual)
 			})
 
 		t.Run("underlying value is AllItemsExpr/returns AllItemsExpr",
@@ -48,12 +42,8 @@ func TestPathSegment(t *testing.T) {
 				underTest := NewPathSegment(expected)
 				val := underTest.Value()
 				actual, ok := val.(AllItemsExpr)
-				if !ok {
-					t.Fatalf("expected %T; got %T", expected, val)
-				}
-				if actual != expected {
-					t.Fatalf("expected %+v; got %+v", expected, val)
-				}
+				assert.Ok(t, ok)
+				assert.Equal(t, expected, actual)
 			})
 	})
 
@@ -64,9 +54,7 @@ func TestPathSegment(t *testing.T) {
 				expected := fieldName.String()
 				underTest := NewPathSegment(fieldName)
 				actual := underTest.String()
-				if actual != expected {
-					t.Fatalf("expected %q; got %q", expected, actual)
-				}
+				assert.Equal(t, expected, actual)
 			})
 
 		t.Run("underlying value is IndexExpr/returns IndexExpr.String()",
@@ -74,9 +62,7 @@ func TestPathSegment(t *testing.T) {
 				expected := indexExpr.String()
 				underTest := NewPathSegment(indexExpr)
 				actual := underTest.String()
-				if actual != expected {
-					t.Fatalf("expected %q; got %q", expected, actual)
-				}
+				assert.Equal(t, expected, actual)
 			})
 
 		t.Run("underlying value is AllItemsExpr/returns AllItemsExpr.String()",
@@ -84,9 +70,7 @@ func TestPathSegment(t *testing.T) {
 				expected := allItemsExpr.String()
 				underTest := NewPathSegment(allItemsExpr)
 				actual := underTest.String()
-				if actual != expected {
-					t.Fatalf("expected %q; got %q", expected, actual)
-				}
+				assert.Equal(t, expected, actual)
 			})
 	})
 }

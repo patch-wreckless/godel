@@ -1,8 +1,10 @@
 package fields
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/patch-wreckless/godel/internal/assert"
 	"github.com/patch-wreckless/godel/internal/ptr"
 )
 
@@ -12,9 +14,7 @@ func TestAllItemsExpr(t *testing.T) {
 		expected := AllItemsToken
 		underTest := AllItemsExpr{}
 		actual := underTest.String()
-		if actual != expected {
-			t.Errorf("expected %q; got %q", expected, actual)
-		}
+		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("#Access", func(t *testing.T) {
@@ -41,46 +41,34 @@ func TestAllItemsExpr(t *testing.T) {
 
 					t.Run(tc.name, func(t *testing.T) {
 						underTest := AllItemsExpr{}
-						val, ok := underTest.Access(tc.value)
-						if ok {
-							t.Errorf("expected not ok; got (%+v, true)", val)
-						}
+						_, ok := underTest.Access(tc.value)
+						assert.NotOk(t, ok)
 					})
 				}
 			})
 
 		t.Run("target is nil slice/returns empty slice",
 			func(t *testing.T) {
-				expected := []any{}
 				var target []string
 				underTest := AllItemsExpr{}
 				actual, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
-				if actual == nil {
-					t.Errorf("expected %v; got nil", expected)
-				}
-				if len(expected) != 0 {
-					t.Errorf("expected empty slice; got %v", actual)
-				}
+				assert.Ok(t, ok)
+				assert.NotNil(t, actual)
+				assert.Equal(t, 0, len(actual), func(ec *assert.EqualConf[int]) {
+					ec.WithExpr("len()")
+				})
 			})
 
 		t.Run("target is empty slice/returns empty slice",
 			func(t *testing.T) {
-				expected := []any{}
 				target := []string{}
 				underTest := AllItemsExpr{}
 				actual, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
-				if actual == nil {
-					t.Errorf("expected %v; got nil", expected)
-				}
-				if len(expected) != 0 {
-					t.Errorf("expected empty slice; got %v", actual)
-				}
+				assert.Ok(t, ok)
+				assert.NotNil(t, actual)
+				assert.Equal(t, 0, len(actual), func(ec *assert.EqualConf[int]) {
+					ec.WithExpr("len()")
+				})
 			})
 
 		t.Run("target is non-empty slice/returns all values",
@@ -95,41 +83,28 @@ func TestAllItemsExpr(t *testing.T) {
 				}()
 				underTest := AllItemsExpr{}
 				actual, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
-
+				assert.Ok(t, ok)
+				assert.Equal(t, len(expected), len(actual), func(ec *assert.EqualConf[int]) {
+					ec.WithExpr("len()")
+				})
 				minLen := min(len(expected), len(actual))
 				for i := range minLen {
-					exp := expected[i]
-					act := actual[i]
-					if actual[i] != expected[i] {
-						t.Errorf("expected [%d] to be %q; got %q", i, exp, act)
-					}
-				}
-				if len(expected) > minLen {
-					t.Errorf("missing expected items %v", expected[minLen:])
-				}
-				if len(actual) > minLen {
-					t.Errorf("got unexpected items %v", actual[minLen:])
+					assert.Equal(t, expected[i], actual[i], func(ec *assert.EqualConf[any]) {
+						ec.WithExpr(fmt.Sprintf("[%d]", i))
+					})
 				}
 			})
 
 		t.Run("target is empty array/returns empty slice",
 			func(t *testing.T) {
-				expected := []any{}
 				target := [0]string{}
 				underTest := AllItemsExpr{}
 				actual, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
-				if actual == nil {
-					t.Errorf("expected %v; got nil", expected)
-				}
-				if len(expected) != 0 {
-					t.Errorf("expected empty slice; got %v", actual)
-				}
+				assert.Ok(t, ok)
+				assert.NotNil(t, actual)
+				assert.Equal(t, 0, len(actual), func(ec *assert.EqualConf[int]) {
+					ec.WithExpr("len()")
+				})
 			})
 
 		t.Run("target is non-empty array/returns all values",
@@ -144,23 +119,16 @@ func TestAllItemsExpr(t *testing.T) {
 				}()
 				underTest := AllItemsExpr{}
 				actual, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
+				assert.Ok(t, ok)
 
+				assert.Equal(t, len(expected), len(actual), func(ec *assert.EqualConf[int]) {
+					ec.WithExpr("len()")
+				})
 				minLen := min(len(expected), len(actual))
 				for i := range minLen {
-					exp := expected[i]
-					act := actual[i]
-					if actual[i] != expected[i] {
-						t.Errorf("expected [%d] to be %q; got %q", i, exp, act)
-					}
-				}
-				if len(expected) > minLen {
-					t.Errorf("missing expected items %v", expected[minLen:])
-				}
-				if len(actual) > minLen {
-					t.Errorf("got unexpected items %v", actual[minLen:])
+					assert.Equal(t, expected[i], actual[i], func(ec *assert.EqualConf[any]) {
+						ec.WithExpr(fmt.Sprintf("[%d]", i))
+					})
 				}
 			})
 
@@ -177,23 +145,16 @@ func TestAllItemsExpr(t *testing.T) {
 				}()
 				underTest := AllItemsExpr{}
 				actual, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
+				assert.Ok(t, ok)
 
+				assert.Equal(t, len(expected), len(actual), func(ec *assert.EqualConf[int]) {
+					ec.WithExpr("len()")
+				})
 				minLen := min(len(expected), len(actual))
 				for i := range minLen {
-					exp := expected[i]
-					act := actual[i]
-					if actual[i] != expected[i] {
-						t.Errorf("expected [%d] to be %q; got %q", i, exp, act)
-					}
-				}
-				if len(expected) > minLen {
-					t.Errorf("missing expected items %v", expected[minLen:])
-				}
-				if len(actual) > minLen {
-					t.Errorf("got unexpected items %v", actual[minLen:])
+					assert.Equal(t, expected[i], actual[i], func(ec *assert.EqualConf[any]) {
+						ec.WithExpr(fmt.Sprintf("[%d]", i))
+					})
 				}
 			})
 
@@ -210,23 +171,16 @@ func TestAllItemsExpr(t *testing.T) {
 				}()
 				underTest := AllItemsExpr{}
 				actual, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
+				assert.Ok(t, ok)
 
+				assert.Equal(t, len(expected), len(actual), func(ec *assert.EqualConf[int]) {
+					ec.WithExpr("len()")
+				})
 				minLen := min(len(expected), len(actual))
 				for i := range minLen {
-					exp := expected[i]
-					act := actual[i]
-					if actual[i] != expected[i] {
-						t.Errorf("expected [%d] to be %q; got %q", i, exp, act)
-					}
-				}
-				if len(expected) > minLen {
-					t.Errorf("missing expected items %v", expected[minLen:])
-				}
-				if len(actual) > minLen {
-					t.Errorf("got unexpected items %v", actual[minLen:])
+					assert.Equal(t, expected[i], actual[i], func(ec *assert.EqualConf[any]) {
+						ec.WithExpr(fmt.Sprintf("[%d]", i))
+					})
 				}
 			})
 
@@ -235,29 +189,20 @@ func TestAllItemsExpr(t *testing.T) {
 				var target *[]string
 				underTest := AllItemsExpr{}
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
-				if val != nil {
-					t.Errorf("expected nil; got %+v", val)
-				}
+				assert.Ok(t, ok)
+				assert.Nil(t, val)
 			})
 
 		t.Run("target is non-nil pointer to nil slice/returns untyped nil ok",
 			func(t *testing.T) {
-				expected := []any{}
 				target := ptr.To(([]string)(nil))
 				underTest := AllItemsExpr{}
 				actual, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
-				if actual == nil {
-					t.Errorf("expected %v; got nil", expected)
-				}
-				if len(expected) != 0 {
-					t.Errorf("expected empty slice; got %v", actual)
-				}
+				assert.Ok(t, ok)
+				assert.NotNil(t, actual)
+				assert.Equal(t, 0, len(actual), func(ec *assert.EqualConf[int]) {
+					ec.WithExpr("len()")
+				})
 			})
 
 		t.Run("target is non-nil pointer to non-nil slice/returns item value",
@@ -272,23 +217,16 @@ func TestAllItemsExpr(t *testing.T) {
 				}()
 				underTest := AllItemsExpr{}
 				actual, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
+				assert.Ok(t, ok)
 
+				assert.Equal(t, len(expected), len(actual), func(ec *assert.EqualConf[int]) {
+					ec.WithExpr("len()")
+				})
 				minLen := min(len(expected), len(actual))
 				for i := range minLen {
-					exp := expected[i]
-					act := actual[i]
-					if actual[i] != expected[i] {
-						t.Errorf("expected [%d] to be %q; got %q", i, exp, act)
-					}
-				}
-				if len(expected) > minLen {
-					t.Errorf("missing expected items %v", expected[minLen:])
-				}
-				if len(actual) > minLen {
-					t.Errorf("got unexpected items %v", actual[minLen:])
+					assert.Equal(t, expected[i], actual[i], func(ec *assert.EqualConf[any]) {
+						ec.WithExpr(fmt.Sprintf("[%d]", i))
+					})
 				}
 			})
 	})

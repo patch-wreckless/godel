@@ -9,6 +9,8 @@ package ptr
 
 import (
 	"testing"
+
+	"github.com/patch-wreckless/godel/internal/assert"
 )
 
 func TestTo(t *testing.T) {
@@ -17,8 +19,6 @@ func TestTo(t *testing.T) {
 		expected := -37
 		p := To(expected)
 		actual := *p
-		if actual != expected {
-			t.Errorf("expected %d; got %d", expected, actual)
-		}
+		assert.Equal(t, expected, actual)
 	})
 }

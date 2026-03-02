@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/patch-wreckless/godel/internal/assert"
 	"github.com/patch-wreckless/godel/internal/ptr"
 )
 
@@ -14,9 +15,7 @@ func TestIndexExpr(t *testing.T) {
 			expected := "[42]"
 			underTest := IndexExpr(42)
 			actual := underTest.String()
-			if actual != expected {
-				t.Errorf("expected %q; got %q", expected, actual)
-			}
+			assert.Equal(t, expected, actual)
 		})
 
 	t.Run("#Access", func(t *testing.T) {
@@ -43,10 +42,8 @@ func TestIndexExpr(t *testing.T) {
 
 					t.Run(tc.name, func(t *testing.T) {
 						underTest := IndexExpr(0)
-						val, ok := underTest.Access(tc.value)
-						if ok {
-							t.Errorf("expected not ok; got (%+v, true)", val)
-						}
+						_, ok := underTest.Access(tc.value)
+						assert.NotOk(t, ok)
 					})
 				}
 			})
@@ -55,12 +52,8 @@ func TestIndexExpr(t *testing.T) {
 			var target []string
 			underTest := IndexExpr(len(target))
 			val, ok := underTest.Access(target)
-			if !ok {
-				t.Error("expected ok to be true; got false")
-			}
-			if val != nil {
-				t.Errorf("expected nil; got %+v", val)
-			}
+			assert.Ok(t, ok)
+			assert.Nil(t, val)
 		})
 
 		t.Run("target is non-nil slice/index out of range/returns untyped nil ok",
@@ -68,12 +61,8 @@ func TestIndexExpr(t *testing.T) {
 				target := []string{"zero", "one", "two"}
 				underTest := IndexExpr(len(target))
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
-				if val != nil {
-					t.Errorf("expected nil; got %+v", val)
-				}
+				assert.Ok(t, ok)
+				assert.Nil(t, val)
 			})
 
 		t.Run("target is non-nil slice/index in range/returns item value",
@@ -82,16 +71,10 @@ func TestIndexExpr(t *testing.T) {
 				target := []string{"the", expected, "value"}
 				underTest := IndexExpr(1)
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
+				assert.Ok(t, ok)
 				actual, ok := val.(string)
-				if !ok {
-					t.Fatalf("expected %T; got %T", expected, val)
-				}
-				if actual != expected {
-					t.Errorf("expected %q; got %q", expected, actual)
-				}
+				assert.Ok(t, ok)
+				assert.Equal(t, expected, actual)
 			})
 
 		t.Run("target is array/index out of range/returns not ok",
@@ -101,10 +84,8 @@ func TestIndexExpr(t *testing.T) {
 			func(t *testing.T) {
 				target := [3]string{"zero", "one", "two"}
 				underTest := IndexExpr(len(target))
-				val, ok := underTest.Access(target)
-				if ok {
-					t.Errorf("expected not ok; got (%+v, true)", val)
-				}
+				_, ok := underTest.Access(target)
+				assert.NotOk(t, ok)
 			})
 
 		t.Run("target is array/index in range/returns item value",
@@ -113,16 +94,10 @@ func TestIndexExpr(t *testing.T) {
 				target := [3]string{"the", expected, "value"}
 				underTest := IndexExpr(1)
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
+				assert.Ok(t, ok)
 				actual, ok := val.(string)
-				if !ok {
-					t.Fatalf("expected %T; got %T", expected, val)
-				}
-				if actual != expected {
-					t.Errorf("expected %q; got %q", expected, actual)
-				}
+				assert.Ok(t, ok)
+				assert.Equal(t, expected, actual)
 			})
 
 		t.Run("target is defined type with kind slice/index in range/returns item value",
@@ -132,16 +107,10 @@ func TestIndexExpr(t *testing.T) {
 				target := arr[string]{"the", expected, "value"}
 				underTest := IndexExpr(1)
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
+				assert.Ok(t, ok)
 				actual, ok := val.(string)
-				if !ok {
-					t.Fatalf("expected %T; got %T", expected, val)
-				}
-				if actual != expected {
-					t.Errorf("expected %q; got %q", expected, actual)
-				}
+				assert.Ok(t, ok)
+				assert.Equal(t, expected, actual)
 			})
 
 		t.Run("target is defined type with kind array/index in range/returns item value",
@@ -151,16 +120,10 @@ func TestIndexExpr(t *testing.T) {
 				target := arr[string]{"the", expected, "value"}
 				underTest := IndexExpr(1)
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
+				assert.Ok(t, ok)
 				actual, ok := val.(string)
-				if !ok {
-					t.Fatalf("expected %T; got %T", expected, val)
-				}
-				if actual != expected {
-					t.Errorf("expected %q; got %q", expected, actual)
-				}
+				assert.Ok(t, ok)
+				assert.Equal(t, expected, actual)
 			})
 
 		t.Run("item is nil pointer/returns typed nil",
@@ -168,16 +131,10 @@ func TestIndexExpr(t *testing.T) {
 				target := []*string{ptr.To("the"), nil, ptr.To("value")}
 				underTest := IndexExpr(1)
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
+				assert.Ok(t, ok)
 				actual, ok := val.(*string)
-				if !ok {
-					t.Fatalf("expected %T; got %T", actual, val)
-				}
-				if actual != nil {
-					t.Errorf("expected nil; got %p", actual)
-				}
+				assert.Ok(t, ok)
+				assert.Nil(t, actual)
 			})
 
 		t.Run("item is non-nil pointer/returns item value",
@@ -186,16 +143,10 @@ func TestIndexExpr(t *testing.T) {
 				target := []*string{ptr.To("the"), expected, ptr.To("value")}
 				underTest := IndexExpr(1)
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
+				assert.Ok(t, ok)
 				actual, ok := val.(*string)
-				if !ok {
-					t.Fatalf("expected %T; got %T", expected, val)
-				}
-				if actual != expected {
-					t.Errorf("expected %p; got %p", expected, actual)
-				}
+				assert.Ok(t, ok)
+				assert.Equal(t, expected, actual)
 			})
 
 		t.Run("target is nil pointer to slice/returns untyped nil ok",
@@ -203,12 +154,8 @@ func TestIndexExpr(t *testing.T) {
 				var target *[]string
 				underTest := IndexExpr(1)
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
-				if val != nil {
-					t.Errorf("expected nil; got %+v", val)
-				}
+				assert.Ok(t, ok)
+				assert.Nil(t, val)
 			})
 
 		t.Run("target is non-nil pointer to nil slice/returns untyped nil ok",
@@ -216,12 +163,8 @@ func TestIndexExpr(t *testing.T) {
 				target := ptr.To(([]string)(nil))
 				underTest := IndexExpr(1)
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
-				if val != nil {
-					t.Errorf("expected nil; got %+v", val)
-				}
+				assert.Ok(t, ok)
+				assert.Nil(t, val)
 			})
 
 		t.Run("target is non-nil pointer to non-nil slice/returns item value",
@@ -230,16 +173,10 @@ func TestIndexExpr(t *testing.T) {
 				target := ptr.To([]string{"the", expected, "value"})
 				underTest := IndexExpr(1)
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
+				assert.Ok(t, ok)
 				actual, ok := val.(string)
-				if !ok {
-					t.Fatalf("expected %T; got %T", expected, val)
-				}
-				if actual != expected {
-					t.Errorf("expected %q; got %q", expected, actual)
-				}
+				assert.Ok(t, ok)
+				assert.Equal(t, expected, actual)
 			})
 	})
 }

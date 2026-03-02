@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/patch-wreckless/godel/internal/assert"
 	"github.com/patch-wreckless/godel/internal/ptr"
 )
 
@@ -34,16 +35,11 @@ func TestFieldName(t *testing.T) {
 					t.Run(tc, func(t *testing.T) {
 						expected := InvalidFieldName{Token: tc}
 						_, err := NewFieldName(tc)
-						if err == nil {
-							t.Fatalf("expected error; got nil")
-						}
 						var actual InvalidFieldName
 						if !errors.As(err, &actual) {
 							t.Fatalf("expected %T; got %T", expected, err)
 						}
-						if actual != expected {
-							t.Fatalf("expected %+v; got %+v", expected, err)
-						}
+						assert.Equal(t, expected, actual)
 					})
 				}
 			})
@@ -55,9 +51,7 @@ func TestFieldName(t *testing.T) {
 
 					t.Run(tc, func(t *testing.T) {
 						_, err := NewFieldName(tc)
-						if err != nil {
-							t.Fatalf("expected no error; got %q", err.Error())
-						}
+						assert.Nil(t, err)
 					})
 				}
 			})
@@ -102,9 +96,7 @@ func TestFieldName(t *testing.T) {
 		expected := ".Foo"
 		underTest := MustFieldName("Foo")
 		actual := underTest.String()
-		if actual != expected {
-			t.Errorf("expected %q; got %q", expected, actual)
-		}
+		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("#Access", func(t *testing.T) {
@@ -131,10 +123,8 @@ func TestFieldName(t *testing.T) {
 
 					t.Run(tc.name, func(t *testing.T) {
 						underTest := MustFieldName("Foo")
-						val, ok := underTest.Access(tc.value)
-						if ok {
-							t.Errorf("expected not ok; got (%+v, true)", val)
-						}
+						_, ok := underTest.Access(tc.value)
+						assert.NotOk(t, ok)
 					})
 				}
 			})
@@ -143,10 +133,8 @@ func TestFieldName(t *testing.T) {
 			func(t *testing.T) {
 				target := struct{}{}
 				underTest := MustFieldName("Foo")
-				val, ok := underTest.Access(target)
-				if ok {
-					t.Errorf("expected not ok; got (%+v, true)", val)
-				}
+				_, ok := underTest.Access(target)
+				assert.NotOk(t, ok)
 			})
 
 		t.Run("target is struct with matching unexpported field/returns not ok",
@@ -155,10 +143,8 @@ func TestFieldName(t *testing.T) {
 					foo: "unexpected",
 				}
 				underTest := MustFieldName("foo")
-				val, ok := underTest.Access(target)
-				if ok {
-					t.Errorf("expected not ok; got (%+v, true)", val)
-				}
+				_, ok := underTest.Access(target)
+				assert.NotOk(t, ok)
 			})
 
 		t.Run("target is struct with matching exported field/returns field value",
@@ -169,16 +155,10 @@ func TestFieldName(t *testing.T) {
 				}
 				underTest := MustFieldName("Foo")
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
+				assert.Ok(t, ok)
 				actual, ok := val.(string)
-				if !ok {
-					t.Fatalf("expected %T; got %T", expected, val)
-				}
-				if actual != expected {
-					t.Errorf("expected %q; got %q", expected, actual)
-				}
+				assert.Ok(t, ok)
+				assert.Equal(t, expected, actual)
 			})
 
 		t.Run("matching field is nil pointer/returns typed nil",
@@ -188,16 +168,10 @@ func TestFieldName(t *testing.T) {
 				}
 				underTest := MustFieldName("Foo")
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
+				assert.Ok(t, ok)
 				actual, ok := val.(*string)
-				if !ok {
-					t.Fatalf("expected %T; got %T", actual, val)
-				}
-				if actual != nil {
-					t.Errorf("expected nil; got %p", actual)
-				}
+				assert.Ok(t, ok)
+				assert.Nil(t, actual)
 			})
 
 		t.Run("matching field is non-nil pointer/returns pointer value",
@@ -208,16 +182,10 @@ func TestFieldName(t *testing.T) {
 				}
 				underTest := MustFieldName("Foo")
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
+				assert.Ok(t, ok)
 				actual, ok := val.(*string)
-				if !ok {
-					t.Fatalf("expected %T; got %T", actual, val)
-				}
-				if actual != expected {
-					t.Errorf("expected %p; got %p", expected, actual)
-				}
+				assert.Ok(t, ok)
+				assert.Equal(t, expected, actual)
 			})
 
 		t.Run("target is nil pointer to struct/returns untyped nil ok",
@@ -225,12 +193,8 @@ func TestFieldName(t *testing.T) {
 				var target *struct{ Foo string }
 				underTest := MustFieldName("Foo")
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
-				if val != nil {
-					t.Errorf("expected nil; got %+v", val)
-				}
+				assert.Ok(t, ok)
+				assert.Nil(t, val)
 			})
 
 		t.Run("target is non-nil pointer to struct/returns field value",
@@ -241,16 +205,10 @@ func TestFieldName(t *testing.T) {
 				}
 				underTest := MustFieldName("Foo")
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
+				assert.Ok(t, ok)
 				actual, ok := val.(string)
-				if !ok {
-					t.Fatalf("expected %T; got %T", expected, val)
-				}
-				if actual != expected {
-					t.Errorf("expected %q; got %q", expected, actual)
-				}
+				assert.Ok(t, ok)
+				assert.Equal(t, expected, actual)
 			})
 
 		t.Run("target is nil pointer to pointer to struct/returns untyped nil ok",
@@ -258,12 +216,8 @@ func TestFieldName(t *testing.T) {
 				var target **struct{ Foo string }
 				underTest := MustFieldName("Foo")
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
-				if val != nil {
-					t.Errorf("expected nil; got %+v", val)
-				}
+				assert.Ok(t, ok)
+				assert.Nil(t, val)
 			})
 
 		t.Run("target is non-nil pointer to nil pointer to struct/returns untyped nil ok",
@@ -271,12 +225,8 @@ func TestFieldName(t *testing.T) {
 				target := ptr.To((*struct{ Foo string })(nil))
 				underTest := MustFieldName("Foo")
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
-				if val != nil {
-					t.Errorf("expected nil; got %+v", val)
-				}
+				assert.Ok(t, ok)
+				assert.Nil(t, val)
 			})
 
 		t.Run("target is non-nil pointer to non-nil pointer to struct/returns field value",
@@ -287,16 +237,10 @@ func TestFieldName(t *testing.T) {
 				})
 				underTest := MustFieldName("Foo")
 				val, ok := underTest.Access(target)
-				if !ok {
-					t.Error("expected ok to be true; got false")
-				}
+				assert.Ok(t, ok)
 				actual, ok := val.(string)
-				if !ok {
-					t.Fatalf("expected %T; got %T", expected, val)
-				}
-				if actual != expected {
-					t.Errorf("expected %q; got %q", expected, actual)
-				}
+				assert.Ok(t, ok)
+				assert.Equal(t, expected, actual)
 			})
 	})
 }
