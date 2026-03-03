@@ -6,9 +6,16 @@ import (
 
 func TestEqual(t *testing.T) {
 
-	t.Run("values are equal/does not report error", func(t *testing.T) {
+	t.Run("comparable values are equal/does not report error", func(t *testing.T) {
 		mockT := newMockTestingT(t)
 		Equal(mockT, 5, 5)
+	})
+
+	t.Run("interface values are equal/does not report error", func(t *testing.T) {
+		mockT := newMockTestingT(t)
+		var x any = "six"
+		var y any = "six"
+		Equal(mockT, x, y)
 	})
 
 	t.Run("values are not equal", func(t *testing.T) {
