@@ -54,7 +54,9 @@ func TestAllItemsExpr(t *testing.T) {
 				actual, ok := underTest.Access(target)
 				assert.Ok(t, ok)
 				assert.NotNil(t, actual)
-				assert.LenEq(t, 0, actual)
+				assert.LenEq(t, 0, actual, func(lec *assert.LenEqConf[any, []any]) {
+					lec.WithExpr("actual")
+				})
 			})
 
 		t.Run("target is empty slice/returns empty slice",
@@ -64,7 +66,9 @@ func TestAllItemsExpr(t *testing.T) {
 				actual, ok := underTest.Access(target)
 				assert.Ok(t, ok)
 				assert.NotNil(t, actual)
-				assert.LenEq(t, 0, actual)
+				assert.LenEq(t, 0, actual, func(lec *assert.LenEqConf[any, []any]) {
+					lec.WithExpr("actual")
+				})
 			})
 
 		t.Run("target is non-empty slice/returns all values",
@@ -80,7 +84,9 @@ func TestAllItemsExpr(t *testing.T) {
 				underTest := AllItemsExpr{}
 				actual, ok := underTest.Access(target)
 				assert.Ok(t, ok)
-				assert.LenEq(t, len(expected), actual)
+				assert.LenEq(t, len(expected), actual, func(lec *assert.LenEqConf[any, []any]) {
+					lec.WithExpr("actual")
+				})
 
 				minLen := min(len(expected), len(actual))
 				for i := range minLen {
@@ -113,7 +119,9 @@ func TestAllItemsExpr(t *testing.T) {
 				underTest := AllItemsExpr{}
 				actual, ok := underTest.Access(target)
 				assert.Ok(t, ok)
-				assert.LenEq(t, len(expected), actual)
+				assert.LenEq(t, len(expected), actual, func(lec *assert.LenEqConf[any, []any]) {
+					lec.WithExpr("actual")
+				})
 
 				minLen := min(len(expected), len(actual))
 				for i := range minLen {
@@ -137,7 +145,9 @@ func TestAllItemsExpr(t *testing.T) {
 				underTest := AllItemsExpr{}
 				actual, ok := underTest.Access(target)
 				assert.Ok(t, ok)
-				assert.LenEq(t, len(expected), actual)
+				assert.LenEq(t, len(expected), actual, func(lec *assert.LenEqConf[any, []any]) {
+					lec.WithExpr("actual")
+				})
 
 				minLen := min(len(expected), len(actual))
 				for i := range minLen {
@@ -161,7 +171,9 @@ func TestAllItemsExpr(t *testing.T) {
 				underTest := AllItemsExpr{}
 				actual, ok := underTest.Access(target)
 				assert.Ok(t, ok)
-				assert.LenEq(t, len(expected), actual)
+				assert.LenEq(t, len(expected), actual, func(lec *assert.LenEqConf[any, []any]) {
+					lec.WithExpr("actual")
+				})
 
 				minLen := min(len(expected), len(actual))
 				for i := range minLen {
@@ -187,7 +199,9 @@ func TestAllItemsExpr(t *testing.T) {
 				actual, ok := underTest.Access(target)
 				assert.Ok(t, ok)
 				assert.NotNil(t, actual)
-				assert.LenEq(t, 0, actual)
+				assert.LenEq(t, 0, actual, func(lec *assert.LenEqConf[any, []any]) {
+					lec.WithExpr("actual")
+				})
 			})
 
 		t.Run("target is non-nil pointer to non-nil slice/returns item value",
@@ -203,7 +217,9 @@ func TestAllItemsExpr(t *testing.T) {
 				underTest := AllItemsExpr{}
 				actual, ok := underTest.Access(target)
 				assert.Ok(t, ok)
-				assert.LenEq(t, len(expected), actual)
+				assert.LenEq(t, len(expected), actual, func(lec *assert.LenEqConf[any, []any]) {
+					lec.WithExpr("actual")
+				})
 
 				minLen := min(len(expected), len(actual))
 				for i := range minLen {

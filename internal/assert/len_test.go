@@ -1,6 +1,8 @@
 package assert
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestLenSliceEq(t *testing.T) {
 
@@ -51,6 +53,18 @@ func TestLenSliceEq(t *testing.T) {
 			mockT := newMockTestingT(t)
 			mockT.Expect().Errorf("expected %s to be %v; got %v", "len()", 2, 3)
 			LenEq(mockT, 2, []int{1, 2, 3})
+		})
+	})
+
+	t.Run("reporting error", func(t *testing.T) {
+
+		t.Run("with expression configured/error includes expression", func(t *testing.T) {
+			mockT := newMockTestingT(t)
+			mockT.Expect().Errorf("expected %s to be %v; got %v", "len(s)", 2, 3)
+			s := []int{1, 2, 3}
+			LenEq(mockT, 2, s, func(c *LenEqConf[int, []int]) {
+				c.WithExpr("s")
+			})
 		})
 	})
 }

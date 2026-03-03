@@ -1,8 +1,5 @@
 package assert
 
-// An EqualConfBuilder configures an [EqualConf].
-type EqualConfBuilder[T comparable] func(*EqualConf[T])
-
 // Equal reports an error to t when the expected and actual values aren't equal.
 func Equal[T comparable](
 	t TestingT,
@@ -28,6 +25,9 @@ func Equal[T comparable](
 		t.Errorf("expected %v; got %v", expected, actual)
 	}
 }
+
+// An EqualConfBuilder configures an [EqualConf].
+type EqualConfBuilder[T comparable] func(*EqualConf[T])
 
 type EqualConf[T comparable] struct {
 	expr string
